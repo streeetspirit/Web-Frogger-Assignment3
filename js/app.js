@@ -21,7 +21,7 @@ class Enemy {
     this.x += this.speed * dt;
     //checkCollision(player);
     if (this.x > width) {
-      this.x = -this.size;
+      this.randomizeParam();
     }
 
   }
@@ -36,8 +36,14 @@ class Enemy {
     for (enemy of enemies) {
       if (enemy.y===y && !(enemy.x > x + tile ||  enemy.x + tile < x )) {
       detectedCollision();
+      }
     }
   }
+
+  randomizeParam() {
+    this.speed = (Math.random() * 200) + 100 * (level-1);
+    this.y = Math.floor((Math.random() * 3) + 1)*83-20;
+    this.x = Math.floor(-tile*(Math.random()*3 + 1));
   }
 
 };
@@ -112,10 +118,14 @@ function reset() {
  */
 let level = 3;
 var allEnemies = [];
-for (let i = 0; i < level+1; i++) {
-  const enemy = new Enemy(Math.floor((Math.random() * 200) + 100 * (level-1)), Math.floor((Math.random() * 3) + 1)*83-20, Math.floor(-tile*(Math.random()*3 + 1)));
-  allEnemies.push(enemy);
+
+function spawnEnemies (level) {
+  for (let i = 0; i < level+1; i++) {
+    const enemy = new Enemy(Math.floor((Math.random() * 200) + 100 * (level-1)), Math.floor((Math.random() * 3) + 1)*83-20, Math.floor(-tile*(Math.random()*3 + 1)));
+    allEnemies.push(enemy);
+  }
 }
+
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
@@ -135,3 +145,5 @@ document.addEventListener('keyup', function(e) {
     console.log(e.keyCode);
     player.handleInput(allowedKeys[e.keyCode]);
 });
+
+document.addEventListener('click', spawnEnemies(level));
