@@ -17,6 +17,7 @@ class Enemy {
 
   // Update the enemy's position
   // Parameter: dt, a time delta between ticks
+  // if an enemy goes out of the screen reset his position and speed with random parameters
   update(dt) {
     this.x += this.speed * dt;
     //checkCollision(player);
@@ -31,15 +32,6 @@ class Enemy {
       ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
   }
 
-  //enemies check if any collision with a player happened
-  static checkCollision(enemies,x,y) {
-    for (enemy of enemies) {
-      if (enemy.y===y && !(enemy.x > x + tile ||  enemy.x + tile < x )) {
-      detectedCollision();
-      }
-    }
-  }
-
   randomizeParam() {
     this.speed = (Math.random() * 200) + 100 * (level-1);
     this.y = Math.floor((Math.random() * 3) + 1)*83-20;
@@ -50,8 +42,7 @@ class Enemy {
 
 
 // player class
-// This class requires an update(), render() and
-// a handleInput() method.
+
 class Player {
   constructor (sprite) {
     this.sprite = sprite;
@@ -74,10 +65,11 @@ class Player {
     if (this.y > height-171) {
       this.y = height-171;
     }
-    if (this.y < tile_y) {
+    if (this.y < 77) {
+      gameBreak = true;
       win();
-      reset();
     }
+
   }
 
   // Draw on the screen
@@ -86,32 +78,56 @@ class Player {
   }
 
   handleInput(key) {
-    switch (key) {
-      case 'left': { this.x -= tile; console.log(key);};
-      break;
-      case 'up': this.y -= tile_y;
-      break;
-      case 'right': this.x += tile;
-      break;
-      case 'down': this.y += tile_y;
-      break;
-
+    if (!gameBreak) {
+      switch (key) {
+        case 'left': this.x -= tile;
+        break;
+        case 'up': this.y -= tile_y;
+        break;
+        case 'right': this.x += tile;
+        break;
+        case 'down': this.y += tile_y;
+        break;
+      }
     }
+
   }
 
 };
 
-function detectCollision() {
+//all enemies check if any collision with a player happened
+function checkCollision(enemies,player) {
 
+  for (enemy of enemies) {
+    if (enemy.y===(player.y-15) && !(enemy.x > (player.x + tile-35) ||  (enemy.x + tile-35) < player.x )) {
+      lose();
+      reset();
+    }
+  }
 }
 
+function lose() {
+  console.log('fail!');
+}
+
+// pause the player update for a moment before resetting it back to the start
 function win() {
+  console.log('success!');
+
+  setTimeout(function() {
+    reset();
+    gameBreak = false;
+  }, 500);
 
 }
 
 function reset() {
-
+  player.x = (width - player.size)/2;
+  player.y = height - 171;
 }
+
+let gameBreak = false;
+
 /* param level - sets up difficulty (amount of enemies spawned)
  * then create an array of enemies
  * enemies get random position between 3 lanes and a random speed between 200 and 400 for level 3 (it's proportional to difficulty)
@@ -142,7 +158,6 @@ document.addEventListener('keyup', function(e) {
         39: 'right',
         40: 'down'
     };
-    console.log(e.keyCode);
     player.handleInput(allowedKeys[e.keyCode]);
 });
 
