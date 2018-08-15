@@ -113,7 +113,7 @@ function lose() {
 // pause the player update for a moment before resetting it back to the start
 function win() {
   console.log('success!');
-
+  player.scale(1.4,1.4);
   setTimeout(function() {
     reset();
     gameBreak = false;
