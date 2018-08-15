@@ -50,7 +50,7 @@ h1 {
     padding: 20px;
     border: 1px solid #888;
     width: 600px;
-    height: 500px;
+    height: 600px;
     left: 0;
     top: 50%;
     text-align: center;
@@ -59,6 +59,11 @@ h1 {
 .highlight {
     border: 3px solid #f66;
     border-radius: 5px;
+}
+
+.gameover {
+  display:none;
+  padding-left: 10px;
 }
 
  .ok {

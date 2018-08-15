@@ -99,11 +99,12 @@ class Player {
 
 //all enemies check if any collision with a player happened
 function checkCollision(enemies,player) {
-
-  for (enemy of enemies) {
-    if (enemy.y===(player.y-15) && !(enemy.x > (player.x + tile-35) ||  (enemy.x + tile-35) < player.x )) {
-      gameBreak = true;
-      lose();
+  if (!gameBreak) {
+    for (enemy of enemies) {
+      if (enemy.y===(player.y-15) && !(enemy.x > (player.x + tile-35) ||  (enemy.x + tile-35) < player.x )) {
+        gameBreak = true;
+        lose();
+      }
     }
   }
 }
@@ -111,22 +112,23 @@ function checkCollision(enemies,player) {
 // every time player hits a bug it flickers red, freezes for a moment then resets
 // remove one life point, in case there are 0 lives - do game over
 function lose() {
-  player.lives--;
   player.current_sprite = player.sprite[2];
   setTimeout(function() {
     reset();
     player.current_sprite = player.sprite[0];
     gameBreak = false;
   }, 250);
+  player.lives --;
   if (player.lives<=0) {
+    gameBreak = true;
     gameOver();
   }
+  console.log(player.lives);
 }
 
 // winning scenario - flicker green,
 // pause the player update for a moment before resetting it back to the start
 function win() {
-  player.points ++;
   player.current_sprite = player.sprite[1];
   setTimeout(function() {
     reset();
@@ -134,7 +136,8 @@ function win() {
     gameBreak = false;
   }, 500);
   level++;
-
+  player.points ++;
+  console.log(player.points);
 }
 
 function reset() {
@@ -142,11 +145,36 @@ function reset() {
   player.y = height - 171;
 }
 
+// when the player is out of lives, game is stopped by overlaying gameover screen
+// player record is added to a leaderboard
 function gameOver() {
+  var date = getTime();
+  scoreRecord = `<li>On ${date}<strong> ${name}</strong>, `;
+  if (player.points===1) {
+    scoreRecord += `reached water:<strong> ${player.points} time</strong></li>`;
+  } else {
+    scoreRecord += `reached water:<strong> ${player.points} times</strong></li>`;
+  }
   $("#scoreboard").append(scoreRecord);
-
+  showGameOverScreen();
 }
-// parameter to set tiny pauses whem player wins or get hit
+
+function getTime() {
+let d = new Date(),
+    minutes = d.getMinutes().toString().length == 1 ? '0'+d.getMinutes() : d.getMinutes(),
+    hours = d.getHours().toString().length == 1 ? '0'+d.getHours() : d.getHours(),
+    ampm = d.getHours() >= 12 ? 'pm' : 'am',
+    months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+return days[d.getDay()]+' '+months[d.getMonth()]+' '+d.getDate()+' '+d.getFullYear()+' '+hours+':'+minutes+ampm;
+}
+
+function showGameOverScreen () {
+  $(".popup").css("display", "block");
+  $(".gameover").css("display", "inline");
+}
+
+// parameter to set tiny pauses when player wins or get hit
 let gameBreak = false;
 
 /* param level - sets up difficulty (amount of enemies spawned)
@@ -159,7 +187,8 @@ let gameBreak = false;
 // Place the player object in a variable called player
 var allEnemies = [];
 let avatar="boy";
-var player = new Player(['images/char-boy.png', 'images/char-boy-blue.png','images/char-boy-red.png']);;
+let name;
+var player = new Player(['images/char-boy.png', 'images/char-boy-blue.png','images/char-boy-red.png']);
 let level = 3;
 
 function spawnEnemies (level) {
@@ -188,12 +217,17 @@ let scoreRecord;
 // saving user's data in the Popup
 // hide the popup
 $(".ok").click(function startGame(event) {
-  let name = $(".input").val();
-  scoreRecord += `<strong>Name:</strong> ${name}</li>`;
+  name = $(".input").val();
+
   $(".popup").css("display", "none");
+  $(".gameover").css("display", "none");
   spawnEnemies(level);
-  if (avatar==='girl') {
+  if ($("#girl").hasClass("highlight")) {
+    avatar='girl';
     player = new Player(['images/char-cat-girl.png', 'images/char-cat-girl-blue.png','images/char-cat-girl-red.png']);
+  } else {
+    avatar="boy";
+    player = new Player(['images/char-boy.png', 'images/char-boy-blue.png','images/char-boy-red.png']);
   }
 
 });
@@ -207,7 +241,6 @@ $(".input").keypress(function(event) {
 });
 
 $("#boy").click(function chooseBoy(event) {
-    avatar = 'boy';
     if ($("#girl").hasClass("highlight")) {
       $("#girl").removeClass("highlight");
       $("#boy").addClass("highlight");
@@ -215,7 +248,6 @@ $("#boy").click(function chooseBoy(event) {
 });
 
 $("#girl").click(function chooseGirl(event) {
-    avatar = 'girl';
     if ($("#boy").hasClass("highlight")) {
       $("#boy").removeClass("highlight");
       $("#girl").addClass("highlight");

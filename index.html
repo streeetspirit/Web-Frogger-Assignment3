@@ -8,12 +8,16 @@
 
 </head>
 <body>
+  <div class="container" id="game">
+  </div>
 
   <!-- Popup to choose character -->
   <div class="popup">
     <div class="popup-inner">
-      <!-- <span class="close" tabindex="0" role="button">&times;</span>  -->
-      <h1>Choose your character!</h1>
+      <div  class="gameover">
+        <h1><strong>GAME OVER</strong></h1>
+      </div>
+      <h1>Choose your character <span class="gameover"> to start over</span>!</h1>
       <div>
         <img alt="boy" src = 'images/char-boy.png' id='boy' class='highlight'>
         <img alt="girl" src = 'images/char-cat-girl.png' id='girl'>
@@ -26,14 +30,14 @@
     </div>
   </div>
 
-  <!-- score board
+
   <div class="container">
     <h1>Score Board</h1>
     <ol id="scoreboard">
 
     </ol>
   </div>
-  -->
+
     <script src="js/resources.js"></script>
     <script src="js/app.js"></script>
     <script src="js/engine.js"></script>
