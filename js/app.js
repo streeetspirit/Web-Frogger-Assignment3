@@ -5,13 +5,11 @@ const height = 83*7;
 
 // Enemies our player must avoid
 class Enemy {
-  constructor (speed, y, x = -tile) {
+  constructor () {
     // The image/sprite for our enemies, moving speed, and starting position
     this.sprite = 'images/enemy-bug.png';
     this.size = tile;
-    this.x = x;
-    this.y = y;
-    this.speed = speed;
+    this.randomizeParam();
 
   }
 
@@ -33,7 +31,7 @@ class Enemy {
   }
 
   randomizeParam() {
-    this.speed = (Math.random() * 200) + 100 * (level-1);
+    this.speed = (Math.random() * 200) + 80 * (level-1);
     this.y = Math.floor((Math.random() * 3) + 1)*83-20;
     this.x = Math.floor(-tile*(Math.random()*3 + 1));
   }
@@ -55,8 +53,8 @@ class Player {
     this.points = 0;
   }
 
-// check if a player drifted off the screen
-// if a player reached the top water layer - add points and reset the player
+  // check if a player drifted off the screen
+  // if a player reached the top water layer - add points and reset the player
   update() {
     if (this.x > width-tile) {
       this.x = width-tile;
@@ -74,9 +72,17 @@ class Player {
 
   }
 
+  drawLives() {
+    let xUI=0,
+        yUI=0;
+    for (let i=0; i<this.lives; i++) {
+      ctx.drawImage(Resources.get('images/Heart1.png'), xUI+i*50, yUI);
+    }
+  }
   // Draw on the screen
   render() {
       ctx.drawImage(Resources.get(this.current_sprite), this.x, this.y);
+      this.drawLives();
   }
 
   handleInput(key) {
@@ -92,10 +98,15 @@ class Player {
         break;
       }
     }
+  }
 
+  restart() {
+    this.lives = 3;
+    this.points = 0;
   }
 
 };
+
 
 //all enemies check if any collision with a player happened
 function checkCollision(enemies,player) {
@@ -119,25 +130,30 @@ function lose() {
     gameBreak = false;
   }, 250);
   player.lives --;
-  if (player.lives<=0) {
+  if (player.lives<0) {
     gameBreak = true;
     gameOver();
   }
-  console.log(player.lives);
+
 }
 
-// winning scenario - flicker green,
+// winning scenario - flicker green, show score
 // pause the player update for a moment before resetting it back to the start
+// spawn one more enemy
 function win() {
+  let score = $("#score");
+  score.html(player.points+1);
   player.current_sprite = player.sprite[1];
+  score.css("display", "block");
   setTimeout(function() {
     reset();
     player.current_sprite = player.sprite[0];
+    score.css("display", "none");
     gameBreak = false;
   }, 500);
   level++;
   player.points ++;
-  console.log(player.points);
+  spawnEnemies(1);
 }
 
 function reset() {
@@ -149,7 +165,7 @@ function reset() {
 // player record is added to a leaderboard
 function gameOver() {
   var date = getTime();
-  scoreRecord = `<li>On ${date}<strong> ${name}</strong>, `;
+  scoreRecord = `<li>On ${date}<strong> ${name}</strong> `;
   if (player.points===1) {
     scoreRecord += `reached water:<strong> ${player.points} time</strong></li>`;
   } else {
@@ -157,8 +173,10 @@ function gameOver() {
   }
   $("#scoreboard").append(scoreRecord);
   showGameOverScreen();
+  allEnemies.length = 0;
 }
 
+//format time to look friendly in a leaderboard
 function getTime() {
 let d = new Date(),
     minutes = d.getMinutes().toString().length == 1 ? '0'+d.getMinutes() : d.getMinutes(),
@@ -191,14 +209,12 @@ let name;
 var player = new Player(['images/char-boy.png', 'images/char-boy-blue.png','images/char-boy-red.png']);
 let level = 3;
 
-function spawnEnemies (level) {
-  for (let i = 0; i < level+1; i++) {
-    const enemy = new Enemy(Math.floor((Math.random() * 200) + 100 * (level-1)), Math.floor((Math.random() * 3) + 1)*83-20, Math.floor(-tile*(Math.random()*3 + 1)));
+function spawnEnemies (amount) {
+  for (let i = 0; i < amount; i++) {
+    const enemy = new Enemy();
     allEnemies.push(enemy);
   }
 }
-
-//choose player character
 
 
 // This listens for key presses and sends the keys to your
@@ -215,12 +231,13 @@ document.addEventListener('keyup', function(e) {
 
 let scoreRecord;
 // saving user's data in the Popup
+//choose player character
 // hide the popup
 $(".ok").click(function startGame(event) {
   name = $(".input").val();
-
   $(".popup").css("display", "none");
   $(".gameover").css("display", "none");
+  level = 3;
   spawnEnemies(level);
   if ($("#girl").hasClass("highlight")) {
     avatar='girl';
@@ -229,8 +246,10 @@ $(".ok").click(function startGame(event) {
     avatar="boy";
     player = new Player(['images/char-boy.png', 'images/char-boy-blue.png','images/char-boy-red.png']);
   }
+  player.restart();
 
 });
+
 
 // if Enter key is pressed in the input field - do the same as if Ok button is pressed
 $(".input").keypress(function(event) {

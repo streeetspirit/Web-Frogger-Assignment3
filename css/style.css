@@ -11,7 +11,9 @@ body {
     padding: 0;
 }
 
-
+li {
+  text-align: left;
+}
 .container {
     display: flex;
     justify-content: center;
@@ -52,7 +54,7 @@ h1 {
     width: 600px;
     height: 600px;
     left: 0;
-    top: 50%;
+    top: 30%;
     text-align: center;
  }
 
@@ -102,4 +104,19 @@ h1 {
 .stats,
 .scoreboard {
    text-align: center;
+}
+
+#score {
+  text-align: center;
+  font-weight: bold;
+  font-size: 280px;
+  color:  rgba(46, 61, 73, 0.8);
+  font-family: 'Hanalei Fill', cursive;
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 30%;
+  top: 6%;
+  width: 500px;
+  height: 500px;
 }
