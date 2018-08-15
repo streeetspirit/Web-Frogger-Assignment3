@@ -46,11 +46,13 @@ class Enemy {
 class Player {
   constructor (sprite) {
     this.sprite = sprite;
+    this.current_sprite = sprite[0];
     this.size = 101;
     //find position for left top corner of the sprite
     this.x = (width - this.size)/2;
     this.y = height - 171;
-
+    this.lives = 3;
+    this.points = 0;
   }
 
 // check if a player drifted off the screen
@@ -74,7 +76,7 @@ class Player {
 
   // Draw on the screen
   render() {
-      ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+      ctx.drawImage(Resources.get(this.current_sprite), this.x, this.y);
   }
 
   handleInput(key) {
@@ -100,24 +102,38 @@ function checkCollision(enemies,player) {
 
   for (enemy of enemies) {
     if (enemy.y===(player.y-15) && !(enemy.x > (player.x + tile-35) ||  (enemy.x + tile-35) < player.x )) {
+      gameBreak = true;
       lose();
-      reset();
     }
   }
 }
 
+// every time player hits a bug it flickers red, freezes for a moment then resets
+// remove one life point, in case there are 0 lives - do game over
 function lose() {
-  console.log('fail!');
-}
-
-// pause the player update for a moment before resetting it back to the start
-function win() {
-  console.log('success!');
-  player.scale(1.4,1.4);
+  player.lives--;
+  player.current_sprite = sprite[1];
   setTimeout(function() {
     reset();
+    player.current_sprite = sprite[0];
     gameBreak = false;
   }, 500);
+  if (player.lives<=0) {
+    gameOver();
+  }
+}
+
+// winning scenario - flicker green,
+// pause the player update for a moment before resetting it back to the start
+function win() {
+  player.points ++;
+  player.current_sprite = sprite[2];
+  setTimeout(function() {
+    reset();
+    player.current_sprite = sprite[0];
+    gameBreak = false;
+  }, 500);
+  level++;
 
 }
 
@@ -126,6 +142,11 @@ function reset() {
   player.y = height - 171;
 }
 
+function gameOver() {
+  $("#scoreboard").append(scoreRecord);
+
+}
+// parameter to set tiny pauses whem player wins or get hit
 let gameBreak = false;
 
 /* param level - sets up difficulty (amount of enemies spawned)
@@ -133,6 +154,11 @@ let gameBreak = false;
  * enemies get random position between 3 lanes and a random speed between 200 and 400 for level 3 (it's proportional to difficulty)
  */
 let level = 3;
+
+// Now instantiate your objects.
+// Place all enemy objects in an array called allEnemies
+// if enemy has reached the end of the screen remove it from the array
+// Place the player object in a variable called player
 var allEnemies = [];
 
 function spawnEnemies (level) {
@@ -142,11 +168,10 @@ function spawnEnemies (level) {
   }
 }
 
+//choose player character
+let avatar [];
 
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// if enemy has reached the end of the screen remove it from the array
-// Place the player object in a variable called player
+
 var player = new Player('images/char-boy.png');
 
 // This listens for key presses and sends the keys to your
@@ -162,3 +187,20 @@ document.addEventListener('keyup', function(e) {
 });
 
 document.addEventListener('click', spawnEnemies(level));
+
+let scoreRecord;
+// saving user's data in the Popup
+// hide the popup
+$(".ok").click(function saveRecord(event) {
+  let name = $(".input").val();
+  scoreRecord += `<strong>Name:</strong> ${name}</li>`;
+  $(".popup").css("display", "none");
+});
+
+// if Enter key is pressed in the input field - do the same as if Ok button is pressed
+$(".input").keypress(function(event) {
+  if (event.keyCode === 13) {
+    event.preventDefault();
+    $(".ok").click();
+  }
+});
