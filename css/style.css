@@ -1,5 +1,6 @@
 body {
     text-align: center;
+    font-family: 'Open Sans', sans-serif;
 }
 
 html,
@@ -44,31 +45,24 @@ h1 {
 }
 
  .popup-inner {
-     background-color: #aaa;
-     font-family: 'Coda', cursive;
-     margin: auto;
-     padding: 20px;
-     border: 1px solid #888;
-     width: 80%;
+    background-color: #efeeff;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 600px;
+    height: 500px;
+    left: 0;
+    top: 50%;
+    text-align: center;
  }
 
- /* Close Button */
- .close {
-     color: #388;
-     float: right;
-     font-size: 28px;
-     font-weight: bold;
- }
-
- .close:hover,
- .close:focus {
-     color: #000;
-     text-decoration: none;
-     cursor: pointer;
- }
+.highlight {
+    border: 3px solid #f66;
+    border-radius: 5px;
+}
 
  .ok {
-    color: #02ccba;
+    color: #444;
     display: flex;
     justify-content: center;
     margin-left: auto;
@@ -82,7 +76,7 @@ h1 {
 
  .ok:hover,
  .ok:focus {
-    color: #aa7ecd;
+    color: #f66;
     text-decoration: none;
     cursor: pointer;
 
@@ -90,7 +84,7 @@ h1 {
 
 /* input form styles */
 .input {
-  margin: 0 1em;
+  margin: 1em;
   border-bottom:1px solid #ccc;
   font-size: 26px;
   width:70%

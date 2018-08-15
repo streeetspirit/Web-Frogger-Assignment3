@@ -112,12 +112,12 @@ function checkCollision(enemies,player) {
 // remove one life point, in case there are 0 lives - do game over
 function lose() {
   player.lives--;
-  player.current_sprite = sprite[1];
+  player.current_sprite = player.sprite[2];
   setTimeout(function() {
     reset();
-    player.current_sprite = sprite[0];
+    player.current_sprite = player.sprite[0];
     gameBreak = false;
-  }, 500);
+  }, 250);
   if (player.lives<=0) {
     gameOver();
   }
@@ -127,10 +127,10 @@ function lose() {
 // pause the player update for a moment before resetting it back to the start
 function win() {
   player.points ++;
-  player.current_sprite = sprite[2];
+  player.current_sprite = player.sprite[1];
   setTimeout(function() {
     reset();
-    player.current_sprite = sprite[0];
+    player.current_sprite = player.sprite[0];
     gameBreak = false;
   }, 500);
   level++;
@@ -153,13 +153,14 @@ let gameBreak = false;
  * then create an array of enemies
  * enemies get random position between 3 lanes and a random speed between 200 and 400 for level 3 (it's proportional to difficulty)
  */
-let level = 3;
-
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // if enemy has reached the end of the screen remove it from the array
 // Place the player object in a variable called player
 var allEnemies = [];
+let avatar="boy";
+var player = new Player(['images/char-boy.png', 'images/char-boy-blue.png','images/char-boy-red.png']);;
+let level = 3;
 
 function spawnEnemies (level) {
   for (let i = 0; i < level+1; i++) {
@@ -169,10 +170,7 @@ function spawnEnemies (level) {
 }
 
 //choose player character
-let avatar [];
 
-
-var player = new Player('images/char-boy.png');
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
@@ -186,15 +184,18 @@ document.addEventListener('keyup', function(e) {
     player.handleInput(allowedKeys[e.keyCode]);
 });
 
-document.addEventListener('click', spawnEnemies(level));
-
 let scoreRecord;
 // saving user's data in the Popup
 // hide the popup
-$(".ok").click(function saveRecord(event) {
+$(".ok").click(function startGame(event) {
   let name = $(".input").val();
   scoreRecord += `<strong>Name:</strong> ${name}</li>`;
   $(".popup").css("display", "none");
+  spawnEnemies(level);
+  if (avatar==='girl') {
+    player = new Player(['images/char-cat-girl.png', 'images/char-cat-girl-blue.png','images/char-cat-girl-red.png']);
+  }
+
 });
 
 // if Enter key is pressed in the input field - do the same as if Ok button is pressed
@@ -203,4 +204,20 @@ $(".input").keypress(function(event) {
     event.preventDefault();
     $(".ok").click();
   }
+});
+
+$("#boy").click(function chooseBoy(event) {
+    avatar = 'boy';
+    if ($("#girl").hasClass("highlight")) {
+      $("#girl").removeClass("highlight");
+      $("#boy").addClass("highlight");
+    }
+});
+
+$("#girl").click(function chooseGirl(event) {
+    avatar = 'girl';
+    if ($("#boy").hasClass("highlight")) {
+      $("#boy").removeClass("highlight");
+      $("#girl").addClass("highlight");
+    }
 });
