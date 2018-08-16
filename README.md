@@ -3,6 +3,11 @@ Assignment #3 from Udacity Front-End Web Development Nanodegree.
 
 For this project I used existing template provided by Udacity. This is a java script based game, so majority of the coding happened in .js files, mainly app.js. Index.html and .css files were edited too for additional functionality like UI and leaderboard.
 
+# Running the game on your computer
+1. Clone the repo
+2. open index.html file
+3. Play!
+
 # Game rules
 The goal of the game to reach water without hitting a bug as many times as possible. On every collision with a bug player loses one life.
 
